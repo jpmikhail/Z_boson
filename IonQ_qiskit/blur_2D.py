@@ -63,6 +63,8 @@ def height2circuit(height, X, Y):
     # determine grid size
     # make grid
     grid = make_grid(X, Y)
+    print("grid", grid)
+    
     # determine required qubit number
     n_x = int(np.ceil(np.log(X)/np.log(2))) # create empty state
     n_y = int(np.ceil(np.log(Y)/np.log(2)))
@@ -92,20 +94,24 @@ def height2circuit(height, X, Y):
 def circuit2height(qc, grid, theta=np.pi/10):
     # get the number of qubits from the circuit
     n = qc.num_qubits
+    print("n", n)
     
     ######################################
     qc.ry(theta, [i for i in range(n)])
     
     
     ######################################
+    qc.measure([i for i in range(n)], [i for i in range(n)])
     
-    ket = qi.Statevector(qc.data[0][0].params)
-    qc.data.pop(0)
-    # evolve this by the rest of the circuit
-    ket = ket.evolve(qc)
     
-    # extract the output probabilities
-    p = ket.probabilities_dict()
+    from qiskit import Aer
+    backend = Aer.get_backend('aer_simulator')
+    
+    # Use the following two lines to use IonQ backend
+    # from qiskit_ionq import IonQProvider
+    # backend = IonQProvider().get_backend("ionq_simulator")
+    
+    p = backend.run(qc, shots=1024).result().get_counts()
     
     # determine maximum probs value for rescaling
     max_h = max( p.values() )
