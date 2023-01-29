@@ -8,3 +8,6 @@ The method is to construct an n_duration\*n_notes matrix for each sound element.
 The code to generate the sound matrices and convert them to audio files is in generate_sound_matrices.m. The analysis code, including the partial swap operators is in quantum_swap.py.
 
 Data files resulting from the partial quantum swap are stored in the directory ./procedural_generation/.
+
+## blur
+We apply quantum blur effect to the 2D matrix representing the duration and pitch by applying $R_y$ to all qubits by a given angle $\theta = \pi / 10$. For input file 'sound_elements/csv/A.csv', the output file is 'sound_elements/csv/A_blur.csv'.
