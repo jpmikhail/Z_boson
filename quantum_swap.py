@@ -1,3 +1,4 @@
+import numpy as np
 from qiskit import QuantumCircuit, assemble, Aer
 from qiskit.visualization import plot_histogram
 from qiskit.extensions import UnitaryGate
@@ -17,7 +18,9 @@ def partial_swap(x = 0):
     return gate
     
 def amplitude_to_angle(p):
+    # factor of 0.999 to ensure argument to arcsin < 1
     theta = 2*np.arcsin(np.sqrt(p))
+    return theta
     
 def loop_matrices(A, B, x):
     (n_durations, n_notes) = A.shape
@@ -71,18 +74,29 @@ def get_cij(theta_a, theta_b, x):
     return cij
     
     
-def loop_x(A, B):
-    # fractions for which to apply quantum swap
-    x = np.array([0, 0.2, 0.5, 0.8, 1.0])
-    n = len(x) # number of fractions to loop over
+def loop_x(A, B, x_list):
+    n = len(x_list) # number of fractions to loop over
     
     C = [None for _ in range(n)]
     
     for i in range(n):
-        C[i] = loop_matrices(A, B, x[i])
+        C[i] = loop_matrices(A, B, x_list[i])
         
-    return C    
+    return C
         
 def main():
+    A = np.loadtxt('csv/A.csv', delimiter=',')
+    B = np.loadtxt('csv/B.csv', delimiter=',')
     
+    # fractions for which to apply quantum swap
+    x_list = np.array([0, 0.2, 0.5, 0.8, 1.0])
+    
+    AB = loop_x(A, B, x_list)
+    
+    for i in range(len(AB)):
+        np.savetxt("csv/AB" + str(x_list[i]) + ".csv", AB[i], delimiter = ',')
+        
+        
+if __name__ == "__main__":
+    main()
     
