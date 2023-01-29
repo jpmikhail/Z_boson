@@ -7,10 +7,10 @@ import matplotlib.pyplot as plt
 import random
 
 
-from qiskit import Aer
-#Aer.backends()
-provider = simulator = Aer
-backend = simulator.get_backend('aer_simulator')
+def local_simulator():
+    from qiskit import Aer
+    provider = simulator = Aer
+    backend = simulator.get_backend('aer_simulator')
 
 
 def make_line ( length ):
@@ -26,6 +26,7 @@ def make_line ( length ):
         line = cp0+cp1
     return line
 
+
 def make_grid(X, Y, Z):
     line_X = make_line(X)
     line_Y = make_line(Y)
@@ -38,7 +39,6 @@ def make_grid(X, Y, Z):
     return grid
 
 
-
 def random_height(X, Y, Z):
     height = {}
     for x in range(X):
@@ -49,6 +49,7 @@ def random_height(X, Y, Z):
     return height
 
 def plot_3d(height, X, Y, Z, log=False):
+    
     H = [[0] * X for _ in range(Y)]
     for z in range(Z):
         for x in range(X):
@@ -57,10 +58,10 @@ def plot_3d(height, X, Y, Z, log=False):
                     H[Y-1-y][x] = np.log(height.get((x, y, z), 0))
                 else:    
                     H[Y-1-y][x] = height.get((x, y, z), 0)
+        plt.subplot(Z, 1, z+1)
         plt.imshow(H)
-        plt.show()
-        plt.clf()
-
+    plt.show()
+    plt.clf()
         
         
 def height2circuit(height, X, Y, Z):
@@ -92,8 +93,7 @@ def height2circuit(height, X, Y, Z):
     qc.initialize(state, range(n))
     
     return qc, grid        
-        
-        
+
         
 def circuit2height(qc, grid, theta=np.pi/10):
     # get the number of qubits from the circuit
@@ -127,8 +127,6 @@ def blur(height, X, Y, Z, theta):
     qc, grid = height2circuit(height, X, Y, Z)
     height = circuit2height(qc, grid, theta=theta)
     return height
-    
-        
         
 if __name__ == "__main__":
 
@@ -140,5 +138,5 @@ if __name__ == "__main__":
 
     for i in range(1,6):
         height_ = deepcopy(height)
-        height_ = blur(height, X, Y, Z, theta=np.pi*i/10)
-        #plot_3d(height_, X, Y, Z)
+        height_ = blur(height_, X, Y, Z, theta=np.pi*i/10)
+        plot_3d(height_, X, Y, Z)
